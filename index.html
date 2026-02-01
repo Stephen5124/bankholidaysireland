@@ -2,11 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bank Holidays Ireland</title>
+  <title>Bank Holidays Ireland — Is tomorrow a bank holiday?</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Find out if tomorrow is a bank holiday (public holiday) in Ireland. Includes the next upcoming bank holidays." />
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <h1>Bank Holidays Ireland</h1>
-  <p>Is tomorrow a bank holiday in Ireland?</p>
+  <div class="container">
+    <div class="header">
+      <div class="brand">Bank Holidays Ireland</div>
+      <div class="small">Timezone: Europe/Dublin</div>
+    </div>
+
+    <div class="card hero">
+      <div class="question">Is tomorrow a bank holiday in Ireland?</div>
+
+      <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+        <div id="badge" class="badge no">…</div>
+        <div class="row">
+          <div class="label">Tomorrow</div>
+          <div class="value" id="tomorrow">—</div>
+          <div class="small" id="holidayLine">—</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="row">
+          <div class="label">Today</div>
+          <div class="value" id="today">—</div>
+        </div>
+
+        <div class="row">
+          <div class="label">Holiday name (if yes)</div>
+          <div class="value" id="holidayName">—</div>
+        </div>
+
+        <div class="row" style="grid-column: 1 / -1;">
+          <div class="label">Next bank holiday</div>
+          <div class="value" id="nextHoliday">—</div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <div class="label">Upcoming bank holidays</div>
+        <ul class="upcoming" id="upcoming"></ul>
+      </div>
+
+      <div class="footer">
+       
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
 </body>
 </html>
