@@ -1,0 +1,125 @@
+async function loadHolidays() {
+  const res = await fetch("./holidays-ie.json", { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to load holidays-ie.json");
+  return res.json();
+}
+
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+function getTodayIsoInTimeZone(timeZone) {
+  const parts = new Intl.DateTimeFormat("en-IE", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+
+  const y = parts.find(p => p.type === "year").value;
+  const m = parts.find(p => p.type === "month").value;
+  const d = parts.find(p => p.type === "day").value;
+  return `${y}-${m}-${d}`;
+}
+
+function addDaysIso(isoDate, days) {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const utc = Date.UTC(y, m - 1, d);
+  const nextUtc = utc + days * 24 * 60 * 60 * 1000;
+  const dt = new Date(nextUtc);
+  return `${dt.getUTCFullYear()}-${pad2(dt.getUTCMonth() + 1)}-${pad2(dt.getUTCDate())}`;
+}
+
+function formatFriendly(isoDate, timeZone) {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  // Create a UTC date at midnight, then format it in Europe/Dublin
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return new Intl.DateTimeFormat("en-IE", {
+    timeZone,
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  }).format(dt);
+}
+
+function findNextHoliday(holidays, fromIsoExclusive) {
+  return holidays.find(h => h.date > fromIsoExclusive) || null;
+}
+
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+function setHtml(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
+function setBadge(isHoliday) {
+  const badge = document.getElementById("badge");
+  if (!badge) return;
+
+  badge.className = "badge " + (isHoliday ? "yes" : "no");
+  badge.textContent = isHoliday ? "YES" : "NO";
+}
+
+function renderUpcoming(holidays, fromIsoExclusive, timeZone) {
+  const upcoming = holidays.filter(h => h.date > fromIsoExclusive).slice(0, 6);
+
+  if (!upcoming.length) {
+    setHtml("upcoming", "<li>No upcoming holidays found.</li>");
+    return;
+  }
+
+  const items = upcoming
+    .map(h => {
+      const when = formatFriendly(h.date, timeZone);
+      return `<li><span class="date">${when}</span><span class="name">${h.name}</span></li>`;
+    })
+    .join("");
+
+  setHtml("upcoming", items);
+}
+
+async function main() {
+  try {
+    const data = await loadHolidays();
+    const timeZone = data.timezone || "Europe/Dublin";
+    const holidays = (data.holidays || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+
+    const todayIso = getTodayIsoInTimeZone(timeZone);
+    const tomorrowIso = addDaysIso(todayIso, 1);
+
+    const tomorrowHoliday = holidays.find(h => h.date === tomorrowIso) || null;
+    const isHoliday = Boolean(tomorrowHoliday);
+
+    setText("today", formatFriendly(todayIso, timeZone));
+    setText("tomorrow", formatFriendly(tomorrowIso, timeZone));
+    setBadge(isHoliday);
+
+    if (isHoliday) {
+      setText("holidayName", tomorrowHoliday.name);
+      setText("holidayLine", "Tomorrow is a public holiday in Ireland.");
+    } else {
+      setText("holidayName", "—");
+      setText("holidayLine", "Tomorrow is not a public holiday in Ireland.");
+    }
+
+    const next = findNextHoliday(holidays, todayIso);
+    if (next) {
+      setText("nextHoliday", `${next.name} — ${formatFriendly(next.date, timeZone)}`);
+    } else {
+      setText("nextHoliday", "No upcoming holidays found in the dataset.");
+    }
+
+    renderUpcoming(holidays, todayIso, timeZone);
+  } catch (err) {
+    console.error(err);
+    setText("holidayLine", "Something went wrong loading the holiday list.");
+    setText("nextHoliday", "—");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", main);
