@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bank Holidays Ireland — Is tomorrow a bank holiday?</title>
+  <title>Bank Holidays Ireland — Is today or tomorrow a bank holiday?</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Find out if tomorrow is a bank holiday (public holiday) in Ireland. Includes the next upcoming bank holidays." />
+  <meta name="description" content="Find out if today or tomorrow is a bank holiday (public holiday) in Ireland. Includes the next upcoming bank holidays." />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -15,29 +15,33 @@
     </div>
 
     <div class="card hero">
-      <div class="question">Is tomorrow a bank holiday in Ireland?</div>
+      <div class="question">Is today or tomorrow a bank holiday in Ireland?</div>
 
       <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
-        <div id="badge" class="badge no">…</div>
+        <div id="badgeToday" class="badge no">…</div>
+        <div class="row">
+          <div class="label">Today</div>
+          <div class="value" id="today">—</div>
+          <div class="small" id="todayLine">—</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+        <div id="badgeTomorrow" class="badge no">…</div>
         <div class="row">
           <div class="label">Tomorrow</div>
           <div class="value" id="tomorrow">—</div>
-          <div class="small" id="holidayLine">—</div>
+          <div class="small" id="tomorrowLine">—</div>
         </div>
       </div>
 
       <div class="grid">
         <div class="row">
-          <div class="label">Today</div>
-          <div class="value" id="today">—</div>
+          <div class="label">Holiday</div>
+          <div class="value" id="holidayName">—</div>
         </div>
 
-        <!-- <div class="row">
-          <div class="label">Holiday name (if yes)</div>
-          <div class="value" id="holidayName">—</div>
-        </div> -->
-
-        <div class="row" style="grid-column: 1 / -1;">
+        <div class="row" id="nextRow" style="grid-column: 1 / -1;">
           <div class="label">Next bank holiday</div>
           <div class="value" id="nextHoliday">—</div>
         </div>
@@ -59,3 +63,4 @@
   <script src="./app.js"></script>
 </body>
 </html>
+

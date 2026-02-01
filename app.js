@@ -1,4 +1,4 @@
-async function loadHolidays() {
+﻿async function loadHolidays() {
   const res = await fetch("./holidays-ie.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to load holidays-ie.json");
   return res.json();
@@ -57,8 +57,8 @@ function setHtml(id, html) {
   if (el) el.innerHTML = html;
 }
 
-function setBadge(isHoliday) {
-  const badge = document.getElementById("badge");
+function setBadge(targetId, isHoliday) {
+  const badge = document.getElementById(targetId);
   if (!badge) return;
 
   badge.className = "badge " + (isHoliday ? "yes" : "no");
@@ -92,33 +92,58 @@ async function main() {
     const todayIso = getTodayIsoInTimeZone(timeZone);
     const tomorrowIso = addDaysIso(todayIso, 1);
 
+    const todayHoliday = holidays.find(h => h.date === todayIso) || null;
     const tomorrowHoliday = holidays.find(h => h.date === tomorrowIso) || null;
-    const isHoliday = Boolean(tomorrowHoliday);
+
+    const isTodayHoliday = Boolean(todayHoliday);
+    const isTomorrowHoliday = Boolean(tomorrowHoliday);
 
     setText("today", formatFriendly(todayIso, timeZone));
     setText("tomorrow", formatFriendly(tomorrowIso, timeZone));
-    setBadge(isHoliday);
 
-    if (isHoliday) {
-      setText("holidayName", tomorrowHoliday.name);
-      setText("holidayLine", "Tomorrow is a public holiday in Ireland.");
-    } else {
-      setText("holidayName", "—");
-      setText("holidayLine", "Tomorrow is not a public holiday in Ireland.");
-    }
+    setBadge("badgeToday", isTodayHoliday);
+    setBadge("badgeTomorrow", isTomorrowHoliday);
 
+    setText(
+      "todayLine",
+      isTodayHoliday
+        ? "Today is a public holiday in Ireland."
+        : "Today is not a public holiday in Ireland."
+    );
+
+    setText(
+      "tomorrowLine",
+      isTomorrowHoliday
+        ? "Tomorrow is a public holiday in Ireland."
+        : "Tomorrow is not a public holiday in Ireland."
+    );
+
+    const nameToShow = todayHoliday
+      ? todayHoliday.name
+      : (tomorrowHoliday ? tomorrowHoliday.name : "—");
+    setText("holidayName", nameToShow);
+
+    // Next bank holiday: show only if it isn't duplicating the Holiday above
     const next = findNextHoliday(holidays, todayIso);
-    if (next) {
+    const nextRow = document.getElementById('nextRow');
+
+    if (tomorrowHoliday && next && next.date === tomorrowIso) {
+      if (nextRow) nextRow.style.display = 'none';
+    } else if (next) {
+      if (nextRow) nextRow.style.display = '';
       setText("nextHoliday", `${next.name} — ${formatFriendly(next.date, timeZone)}`);
     } else {
+      if (nextRow) nextRow.style.display = '';
       setText("nextHoliday", "No upcoming holidays found in the dataset.");
     }
 
     renderUpcoming(holidays, todayIso, timeZone);
   } catch (err) {
     console.error(err);
-    setText("holidayLine", "Something went wrong loading the holiday list.");
+    setText("todayLine", "Something went wrong loading the holiday list.");
+    setText("tomorrowLine", "");
     setText("nextHoliday", "—");
+    setText("holidayName", "—");
   }
 }
 
