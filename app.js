@@ -4,18 +4,10 @@
   return res.json();
 }
 
-function pad2(n) {
-  return String(n).padStart(2, "0");
-}
+function pad2(n) { return String(n).padStart(2, "0"); }
 
 function getTodayIsoInTimeZone(timeZone) {
-  const parts = new Intl.DateTimeFormat("en-IE", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).formatToParts(new Date());
-
+  const parts = new Intl.DateTimeFormat("en-IE", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
   const y = parts.find(p => p.type === "year").value;
   const m = parts.find(p => p.type === "month").value;
   const d = parts.find(p => p.type === "day").value;
@@ -32,55 +24,86 @@ function addDaysIso(isoDate, days) {
 
 function formatFriendly(isoDate, timeZone) {
   const [y, m, d] = isoDate.split("-").map(Number);
-  // Create a UTC date at midnight, then format it in Europe/Dublin
   const dt = new Date(Date.UTC(y, m - 1, d));
-  return new Intl.DateTimeFormat("en-IE", {
-    timeZone,
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  }).format(dt);
+  return new Intl.DateTimeFormat("en-IE", { timeZone, weekday: "long", year: "numeric", month: "long", day: "numeric" }).format(dt);
 }
 
 function findNextHoliday(holidays, fromIsoExclusive) {
   return holidays.find(h => h.date > fromIsoExclusive) || null;
 }
 
-function setText(id, text) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = text;
-}
-
-function setHtml(id, html) {
-  const el = document.getElementById(id);
-  if (el) el.innerHTML = html;
-}
+function setText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+function setHtml(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
 
 function setBadge(targetId, isHoliday) {
   const badge = document.getElementById(targetId);
   if (!badge) return;
-
   badge.className = "badge " + (isHoliday ? "yes" : "no");
   badge.textContent = isHoliday ? "YES" : "NO";
 }
 
 function renderUpcoming(holidays, fromIsoExclusive, timeZone) {
   const upcoming = holidays.filter(h => h.date > fromIsoExclusive).slice(0, 6);
-
-  if (!upcoming.length) {
-    setHtml("upcoming", "<li>No upcoming holidays found.</li>");
-    return;
-  }
-
-  const items = upcoming
-    .map(h => {
-      const when = formatFriendly(h.date, timeZone);
-      return `<li><span class="date">${when}</span><span class="name">${h.name}</span></li>`;
-    })
-    .join("");
-
+  if (!upcoming.length) { setHtml("upcoming", "<li>No upcoming holidays found.</li>"); return; }
+  const items = upcoming.map(h => {
+    const when = formatFriendly(h.date, timeZone);
+    return `<li><span class="date">${when}</span><span class="name">${h.name}</span></li>`;
+  }).join("");
   setHtml("upcoming", items);
+}
+
+// ---- ICS helpers ----
+function ymd(iso) { return iso.replaceAll("-", ""); }
+function escapeIcsText(s) { return String(s).replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/[,;]/g, m => `\\${m}`); }
+function utcStamp() {
+  const d = new Date();
+  const yyyy = d.getUTCFullYear();
+  const mm = pad2(d.getUTCMonth() + 1);
+  const dd = pad2(d.getUTCDate());
+  const hh = pad2(d.getUTCHours());
+  const mi = pad2(d.getUTCMinutes());
+  const ss = pad2(d.getUTCSeconds());
+  return `${yyyy}${mm}${dd}T${hh}${mi}${ss}Z`;
+}
+
+function buildIcsForEvents(events, timeZone) {
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Bank Holidays Ireland//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH"
+  ];
+  for (const h of events) {
+    const startIso = h.date;
+    const endIso = addDaysIso(startIso, 1); // exclusive end for all-day
+    const summary = escapeIcsText(h.name);
+    const uid = `holiday-${ymd(startIso)}@bankholidaysireland`;
+    const url = escapeIcsText(location.href);
+    const desc = escapeIcsText(`Irish public holiday. Timezone: ${timeZone}`);
+    lines.push(
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${utcStamp()}`,
+      `SUMMARY:${summary}`,
+      `DESCRIPTION:${desc}`,
+      `DTSTART;VALUE=DATE:${ymd(startIso)}`,
+      `DTEND;VALUE=DATE:${ymd(endIso)}`,
+      `URL:${url}`,
+      "END:VEVENT"
+    );
+  }
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+function downloadIcs(filename, icsText) {
+  const blob = new Blob([icsText], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; a.style.display = "none";
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
 }
 
 async function main() {
@@ -104,29 +127,15 @@ async function main() {
     setBadge("badgeToday", isTodayHoliday);
     setBadge("badgeTomorrow", isTomorrowHoliday);
 
-    setText(
-      "todayLine",
-      isTodayHoliday
-        ? "Today is a public holiday in Ireland."
-        : "Today is not a public holiday in Ireland."
-    );
+    setText("todayLine", isTodayHoliday ? "Today is a public holiday in Ireland." : "Today is not a public holiday in Ireland.");
+    setText("tomorrowLine", isTomorrowHoliday ? "Tomorrow is a public holiday in Ireland." : "Tomorrow is not a public holiday in Ireland.");
 
-    setText(
-      "tomorrowLine",
-      isTomorrowHoliday
-        ? "Tomorrow is a public holiday in Ireland."
-        : "Tomorrow is not a public holiday in Ireland."
-    );
-
-    const nameToShow = todayHoliday
-      ? todayHoliday.name
-      : (tomorrowHoliday ? tomorrowHoliday.name : "—");
+    const nameToShow = todayHoliday ? todayHoliday.name : (tomorrowHoliday ? tomorrowHoliday.name : "—");
     setText("holidayName", nameToShow);
 
-    // Next bank holiday: show only if it isn't duplicating the Holiday above
+    // Keep next-row duplication handling
     const next = findNextHoliday(holidays, todayIso);
     const nextRow = document.getElementById('nextRow');
-
     if (tomorrowHoliday && next && next.date === tomorrowIso) {
       if (nextRow) nextRow.style.display = 'none';
     } else if (next) {
@@ -135,6 +144,26 @@ async function main() {
     } else {
       if (nextRow) nextRow.style.display = '';
       setText("nextHoliday", "No upcoming holidays found in the dataset.");
+    }
+
+    // All-at-once ICS link
+    const linkAll = document.getElementById('addAllCal');
+    const currentYear = todayIso.slice(0,4);
+    const yearEvents = holidays.filter(h => h.date.slice(0,4) === currentYear);
+    if (linkAll) {
+      if (yearEvents.length) {
+        linkAll.style.display = '';
+        // show the target year in the link text
+        try { linkAll.textContent = `Add all ${currentYear} bank holidays (.ics)`; } catch {}
+        linkAll.onclick = (e) => {
+          e.preventDefault();
+          const ics = buildIcsForEvents(yearEvents, timeZone);
+          const filename = `irish-bank-holidays-${currentYear}.ics`;
+          downloadIcs(filename, ics);
+        };
+      } else {
+        linkAll.style.display = 'none';
+      }
     }
 
     renderUpcoming(holidays, todayIso, timeZone);
@@ -148,3 +177,5 @@ async function main() {
 }
 
 document.addEventListener("DOMContentLoaded", main);
+
+

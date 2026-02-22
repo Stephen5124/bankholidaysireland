@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Find out if today or tomorrow is a bank holiday (public holiday) in Ireland. Includes the next upcoming bank holidays." />
   <meta name="theme-color" content="#169b62" />
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="icon" type="image/png" sizes="96x96" href="./favicon-96x96.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+  <link rel="manifest" href="./site.webmanifest" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -40,18 +45,20 @@
         <div class="row">
           <div class="label">Holiday</div>
           <div class="value" id="holidayName">—</div>
+          
         </div>
 
         <div class="row" id="nextRow" style="grid-column: 1 / -1;">
           <div class="label">Next bank holiday</div>
           <div class="value" id="nextHoliday">—</div>
+          
         </div>
       </div>
 
       <div class="hr"></div>
 
       <div class="row">
-        <div class="label">Upcoming bank holidays</div>
+        <div class="label">Upcoming bank holidays</div>        <div class="small"><a id="addAllCal" class="cal-link" href="#">Add all to calendar (.ics)</a></div>
         <ul class="upcoming" id="upcoming"></ul>
       </div>
 
@@ -64,3 +71,4 @@
   <script src="./app.js"></script>
 </body>
 </html>
+

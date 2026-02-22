@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time Off Planner — Bank Holidays Ireland</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Turn your annual leave into the best time off plan using weekends and Irish bank holidays. Runs in your browser." />
+  <meta name="theme-color" content="#169b62" />
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="icon" type="image/png" sizes="96x96" href="./favicon-96x96.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">Bank Holidays Ireland</div>
+      <div class="small">Timezone: Europe/Dublin</div>
+    </div>
+
+    <div class="card hero">
+      
+      <p class="instructions">
+        Enter how many annual leave days you have and choose a style.
+        Then select <strong>Calculate</strong>. We’ll plan the next 12 months from today
+        (Mon–Fri workdays, weekends and Irish bank holidays off) and suggest
+        non‑overlapping breaks that best use your leave.
+      </p>
+
+      <form id="plannerForm" class="planner-form" onsubmit="return false;">
+        <div class="row">
+          <div class="label">Leave days available</div>
+          <div>
+            <input id="leaveDays" type="number" min="1" max="40" value="10" class="input" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="label">Preference</div>
+          <div class="choice">
+            <label><input type="radio" name="pref" value="more" checked /> More breaks (long weekends)</label>
+            <label><input type="radio" name="pref" value="balanced" /> Balanced</label>
+            <label><input type="radio" name="pref" value="fewer" /> Fewer breaks (longer holidays)</label>
+          </div>              <div class="row">
+          <div class="label">Plan within</div>
+          <div>
+            <div id="yearBrush" class="brush">
+              <div class="brush-track"></div>
+              <div class="brush-selection" id="brushSel"></div>
+              <div class="brush-handle" id="brushStart" aria-label="Brush start" tabindex="0"></div>
+              <div class="brush-handle" id="brushEnd" aria-label="Brush end" tabindex="0"></div>
+            </div>
+            <div class="small" id="brushLabel">—</div>
+          </div>
+        </div><div class="row"><label class="small"><input type="checkbox" id="useAll" /> Use entire leave budget</label>        </div>       <div class="row">       <button id="calcBtn" class="btn">Calculate</button>
+        </div>
+      </form>
+
+      <h2 class="section">Summary</h2>
+      <div id="summary" class="summary card-inner"></div>
+      <h2 class="section">Plan calendar</h2>
+      <div id="calLegend" class="legend"></div>
+      <div id="calendar" class="calendar"></div>
+    </div>
+
+    <div class="footer">
+      <a href="./index.html" class="cal-link">← Back to homepage</a>
+    </div>
+  </div>
+
+  <script src="./timeoff.js"></script>
+</body>
+</html>
+
+
+
+
+

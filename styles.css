@@ -1,23 +1,16 @@
 ﻿:root {
-  --bg: #0a1a10;            /* deep green-black */
-  --card: #0f2317;          /* dark pine */
-  --text: #eef7f0;          /* soft off-white */
-  --muted: #a9c5b3;         /* desaturated green-gray */
-  --yes: #169b62;           /* Irish green */
-  --no: #ff4d4f;            /* clear red for NO */
+  --bg: #0a1a10;
+  --card: #0f2317;
+  --text: #eef7f0;
+  --muted: #a9c5b3;
+  --yes: #169b62;
+  --no: #ff4d4f;
   --border: rgba(255,255,255,0.08);
-  --irish-green: #169b62;   /* palette var retained */
-  --irish-orange: #ff883e;  /* palette var retained */
 }
 
 * { box-sizing: border-box; }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: radial-gradient(1200px 600px at 30% -20%, #114d2a 0%, var(--bg) 55%);
-  color: var(--text);
-}
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: radial-gradient(1200px 600px at 30% -20%, #114d2a 0%, var(--bg) 55%); color: var(--text); }
 
 .container { max-width: 920px; margin: 0 auto; padding: 22px 16px 40px; }
 
@@ -36,7 +29,6 @@ body {
 .badge { display: inline-flex; align-items: center; justify-content: center; font-weight: 900; font-size: 2.2rem; letter-spacing: 1px; width: 120px; height: 64px; border-radius: 14px; border: 1px solid var(--border); }
 
 .badge.yes { background: rgba(22, 155, 98, 0.12); color: var(--yes); border-color: rgba(22,155,98,0.35); }
-
 .badge.no  { background: rgba(255, 77, 79, 0.12); color: var(--no); }
 
 .grid { display: grid; gap: 12px; grid-template-columns: 1fr; margin-top: 12px; }
@@ -45,8 +37,10 @@ body {
 .row { display: grid; gap: 6px; }
 
 .label { color: var(--muted); font-size: 0.95rem; }
-
 .value { font-size: 1.05rem; line-height: 1.35; }
+
+.cal-link { color: var(--yes); text-decoration: none; border-bottom: 1px dashed rgba(22,155,98,0.6); }
+.cal-link:hover { text-decoration: none; border-bottom-color: rgba(22,155,98,1); }
 
 .hr { height: 1px; background: var(--border); margin: 14px 0; }
 
@@ -61,3 +55,62 @@ ul.upcoming .date { color: var(--text); font-weight: 650; }
 ul.upcoming .name { color: var(--muted); }
 
 .footer { margin-top: 16px; color: var(--muted); font-size: 0.92rem; }
+
+@media (max-width: 466px) {
+  /* Stack status blocks; put badge below text */
+  .hero > div { flex-direction: column !important; align-items: flex-start !important; }
+  .hero > div > .row { order: 1; }
+  .hero > div > .badge { order: 2; }
+}
+
+/* Planner form styles */
+.planner-form .input { width: 120px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text); }
+.planner-form .choice { display: grid; gap: 8px; }
+.btn { appearance: none; background: var(--yes); color: #fff; border: none; border-radius: 10px; padding: 10px 14px; font-weight: 700; cursor: pointer; }
+.btn:hover { filter: brightness(0.95); }
+.btn-small { padding: 6px 10px; font-weight: 650; }
+.card-inner { padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; }
+.card-gap { margin-top: 12px; }
+.results { display: grid; gap: 12px; }
+/* Time-off page tweaks */
+.instructions { color: var(--muted); margin: 4px 0 6px; line-height: 1.45; }
+.section { font-size: 1.05rem; margin: 8px 0 6px; color: var(--muted); }
+/* Calendar view */
+.calendar { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .calendar { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1040px) { .calendar { grid-template-columns: 1fr 1fr 1fr; } }
+.month { border: 1px solid var(--border); border-radius: 12px; padding: 10px; background: rgba(255,255,255,0.03); }
+.month-header { display:flex; justify-content: space-between; align-items:center; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.weekdays, .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.weekdays div { text-align: center; color: var(--muted); font-size: 0.82rem; }
+.day { position: relative; border: 1px solid var(--border); border-radius: 8px; min-height: 34px; display: grid; place-items: start; padding: 6px; font-size: 0.9rem; color: var(--text); background: rgba(255,255,255,0.02); }
+.day .num { font-weight: 650; }
+.day.weekend { background: rgba(255,255,255,0.015); }
+.day.holiday::after { content: '•'; position: absolute; right: 6px; top: 4px; color: var(--yes); font-size: 1rem; z-index: 3; pointer-events: none; }
+.day.break { background: rgba(22,155,98,0.12); border-color: rgba(22,155,98,0.35); }
+.day.leave { background: rgba(22,155,98,0.28); border-color: rgba(22,155,98,0.6); }
+.day.today { outline: 2px solid rgba(255,255,255,0.25); }
+.legend { display:flex; gap: 14px; align-items:center; color: var(--muted); font-size: 0.92rem; margin-bottom: 6px; flex-wrap: wrap; }
+.legend .sw { width: 14px; height: 14px; border-radius: 4px; display:inline-block; margin-right:6px; border:1px solid var(--border); }
+.legend .sw.break { background: rgba(22,155,98,0.12); border-color: rgba(22,155,98,0.35); }
+.legend .sw.leave { background: rgba(22,155,98,0.28); border-color: rgba(22,155,98,0.6); }
+.legend .dot::after { content:'•'; color: var(--yes); margin-left:6px; }
+/* Make leave days more obvious */
+.day.leave { background: rgba(22,155,98,0.42); border-color: rgba(22,155,98,0.85); box-shadow: 0 0 0 1px rgba(22,155,98,0.35) inset; }
+.day.leave::before { content: 'Leave'; position: absolute; right: 6px; bottom: 6px; font-size: 0.65rem; line-height: 1; padding: 2px 6px; color: #0a1a10; background: #1ec37a; border-radius: 999px; border: 1px solid rgba(0,0,0,0.25); z-index: 1; }
+.day.leave.today { outline: 2px solid #fff; outline-offset: 0; }
+.day:hover { filter: brightness(1.05); }
+
+/* Summary legend in header */
+.summary .legend { margin-top: 6px; }
+/* Past days (before today) */
+.day.past { opacity: 0.45; filter: grayscale(100%); }
+.day.past .num { color: var(--muted); }
+.day.past.leave, .day.past.break { background: rgba(255,255,255,0.02); border-color: var(--border); box-shadow: none; }
+
+/* Year Timeline Brush */
+.brush { position: relative; height: 38px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); overflow: hidden; }
+.brush-track { position: absolute; inset: 16px 8px 16px 8px; background: rgba(255,255,255,0.06); border-radius: 6px; }
+.brush-selection { position: absolute; top: 16px; bottom: 16px; left: 8px; right: 8px; background: rgba(22,155,98,0.22); border: 1px solid rgba(22,155,98,0.55); border-radius: 6px; pointer-events: none; }
+.brush-handle { position: absolute; top: 8px; width: 22px; height: 22px; border-radius: 50%; background: #1ec37a; border: 2px solid #0a1a10; box-shadow: 0 2px 6px rgba(0,0,0,0.4); cursor: ew-resize; }
+.brush-handle:focus { outline: 2px solid #fff; }
