@@ -10,7 +10,17 @@
     { "date": "2026-08-03", "name": "August Bank Holiday" },
     { "date": "2026-10-26", "name": "October Bank Holiday" },
     { "date": "2026-12-25", "name": "Christmas Day" },
-    { "date": "2026-12-26", "name": "St Stephen's Day" }
+    { "date": "2026-12-26", "name": "St Stephen's Day" },
+    { "date": "2027-01-01", "name": "New Year's Day" },
+    { "date": "2027-02-01", "name": "St Brigid's Day" },
+    { "date": "2027-03-17", "name": "St Patrick's Day" },
+    { "date": "2027-03-29", "name": "Easter Monday" },
+    { "date": "2027-05-03", "name": "May Day" },
+    { "date": "2027-06-07", "name": "June Bank Holiday" },
+    { "date": "2027-08-02", "name": "August Bank Holiday" },
+    { "date": "2027-10-25", "name": "October Bank Holiday" },
+    { "date": "2027-12-25", "name": "Christmas Day" },
+    { "date": "2027-12-26", "name": "St Stephen's Day" }
   ],
   "notes": "Ireland uses Europe/Dublin timezone."
 }
